@@ -44,7 +44,7 @@ def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade
             break
 
     # When everything done, release the capture
-    print("[INFO] - Ending recording and releasing caputre from webcam")
+    print("\n[INFO] - Ending recording and releasing caputre from webcam")
     cap.release()
     cv2.destroyAllWindows()
     fps_arr = np.array(fps_list)
