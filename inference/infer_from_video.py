@@ -47,7 +47,7 @@ def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade
     cap.release()
     cv2.destroyAllWindows()
     fps_arr = np.array(fps_list)
-    print("[INFO] - FPS MEAN: ", str(np.mean(fps_arr)))
+    print("\n[INFO] - FPS MEAN: ", str(np.mean(fps_arr)))
     print("[INFO] - FPS STD: ", str(np.std(fps_arr)))
     return collected_data
 
