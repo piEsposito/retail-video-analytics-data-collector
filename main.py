@@ -1,12 +1,24 @@
 import cv2
+import argparse
 from inference.inference_general_utils import *
 from inference.inference_plot_neuralnets import *
 from inference.infer_from_video import *
 from inference.data_saver_utils import *
 
 
+
+#here we parse the paths for the output data 
+ap = argparse.ArgumentParser()
+ap.add_argument("-or", "--output_raw_data_path", required=False, default="collected_data.csv",
+	help="path to output raw data")
+ap.add_argument("-op", "--output_preprocessed_data_path", required=False, default="collected_preprocessed_data.csv",
+	help="path to output preprocessed data")
+args = vars(ap.parse_args())
+
+#capture video from the webcam of index 0
 cap = cv2.VideoCapture(0)
 
+#here we set up our neural networks and face classifiers 
 age_net_bin = "inference/neuralnets/age-gender-recognition-retail-0013.bin"
 age_net_xml = "inference/neuralnets//age-gender-recognition-retail-0013.xml"
 exec_age_net = load_net(age_net_xml, age_net_bin, device="CPU")
@@ -21,6 +33,7 @@ exec_pose_net = load_net(pose_net_xml, pose_net_bin, device="CPU")
 
 face_cascade = cv2.CascadeClassifier('inference/neuralnets/haarcascade_frontalface_default.xml')
 
+#here we run the program
 data = infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade)
-df = store_gathered_data(data, output_path="collected_data.csv")
-df_hoted = one_hot_encode_gathered_data(df)
+df = store_gathered_data(data, output_path=args["output_raw_data_path"])
+df_hoted = one_hot_encode_gathered_data(df, output_path=args["output_preprocessed_data_path"])
