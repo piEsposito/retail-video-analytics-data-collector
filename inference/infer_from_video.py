@@ -1,13 +1,13 @@
 from inference.inference_general_utils import *
 from inference.inference_plot_neuralnets import *
 import time
-
+import numpy as np
 
 def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade):
     tic = time.time()
     frame_nbr = 0
     collected_data = []
-    
+    fps_list = []
     while(True):
         # Capture frame-by-frame
         video = cap.read()
@@ -35,6 +35,7 @@ def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade
         tictac = tac - tic
         tic = tac
         fps = 1/tictac
+        fps_list.append(fps)
 
         print("Frames per second: {0}".format(fps))
         frame_nbr += 1
@@ -45,5 +46,8 @@ def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
+    fps_arr = np.array(fps_list)
+    print("[INFO] - FPS MEAN: ", str(np.mean(fps_arr)))
+    print("[INFO] - FPS STD: ", str(np.std(fps_arr)))
     return collected_data
 
