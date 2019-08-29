@@ -4,7 +4,7 @@ def store_gathered_data(collected_data, output_path="collected_data_raw.csv"):
     "this function saves the gathered data to a data frame, so we can do stuff with if it"
     as_df = pd.DataFrame(collected_data)
     as_df.columns = ["frame", "age", "gender", "emotion", "yaw", "pitch", "roll"]
-    print("[INFO] saving raw collected data to csv in in path:", output_path)
+    print("\n[INFO] - saving raw collected data to csv in in path:", output_path)
     as_df.to_csv(output_path)
     return as_df 
 
@@ -44,6 +44,6 @@ def one_hot_encode_gathered_data(df, output_path="collected_preprocessed_data.cs
     df["yaw"] = (df["yaw"] - np.mean(df["yaw"]))/ np.std(df["yaw"])
     df["roll"] = (df["roll"] - np.mean(df["roll"]))/ np.std(df["roll"])
     df["pitch"] = (df["pitch"] - np.mean(df["pitch"]))/ np.std(df["pitch"])
-    print("[INFO] saving preprocessed data to csv in in path:", output_path)
+    print("[INFO] - saving preprocessed data to csv in in path:", output_path)
     df.to_csv(output_path)
     return df
