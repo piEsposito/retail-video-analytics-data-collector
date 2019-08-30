@@ -4,7 +4,7 @@
 The retail-video-analytics-data-collector is a Python script that captures frames from your webcam, identifies any faces on it. Run each faces through several neural networks optimized with OpenVINO Model Optimizer gathers the age, gender, emotion (infered from facial expression) and head pose. It stores the data in two csv files: one with the raw data and other with scaled and one-hot encoded data, in the case you want to do some machine learning with it. My objective was to crate a project using Intel-Powered technology, with its pretrained models and OpenVINO toolkit. 
 
 **How it works?** 
- In a few words, it loads the optimized and trained neuralnets and plugs in into a device, loads the face classifier. We then capture each frame, identify the faces on it with the face classifier, get the features for each face with the neuralnets and store it. We got the stored data, copy it, preprocess it with standartscaling and one-hot encoding and, same, store it.
+ In a few words, it loads the optimized and trained neuralnets and plugs in into a device, loads the face classifier. We then capture each frame, identify the faces on it with the face classifier, get the features for each face with the neuralnets and store it. We got the stored data, copy it, preprocess it with standartscaling and one-hot encoding and, same, store it. In the inference folder we also have a Jupyter Notebook, so you can see each block of code working and its paper on this little program.
  
  To run it, once the environment is set, you just need to:
  
