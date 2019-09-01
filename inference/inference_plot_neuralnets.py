@@ -30,10 +30,16 @@ def infere_from_face(frame, gray, face, exec_age_net, exec_aff_net, exec_pose_ne
     this function runs a face troughout age, gender and head-pose net and aff net, both plugged in with OpenVINO Inference Engine
     
     parameters:
-    frame: matrix nxmx3 
-    gray: matrix nxmx1 
+    frame: matrix nxmx3, the latest captured by the camera
+    gray: matrix nxmx1, the same frame, but in gray-scale, so it runs faster
     face: (x, y, width and height), coordinates to find face
     exec_age-aff nets: OpenVINO Inference Engine Executable network
+    
+    what happens here is that we select subset the frame matrix to get only the person's face, so that we can resize it and run
+    it through some neural networks and get its labels
+    
+    as the frame is passed by value due to Python, I decided to use this function to actually plot it in the frame, so we can see
+    the detections
     '''
     
     (x, y, w, h) = face
