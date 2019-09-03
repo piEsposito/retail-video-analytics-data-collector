@@ -20,13 +20,13 @@ The retail-video-analytics-data-collector is a Python script that captures frame
  
  If you know how it works, you can select the device on which your are plugging in your neural networks in the commandline with:
  
- `--age_net_device`
+ `--age_net_device "CPU", "GPU", "MOVIDIUS" or "FPGA" `
  
  
- `--aff_net_device`
+ `--aff_net_device "CPU", "GPU", "MOVIDIUS" or "FPGA"`
  
  
- `--pose_net_device`
+ `--pose_net_device "CPU", "GPU", "MOVIDIUS" or "FPGA"`
  
  
  (or run it with -h to see the command line options)
