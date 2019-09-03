@@ -20,9 +20,9 @@ ap.add_argument("-op", "--output_preprocessed_data_path", required=False, defaul
 
 ap.add_argument('-agde', '--age_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized age_net neural network: MOVIDIUS, CPU, GPU")
-ap.add_argument('-affde', '--aff_net_device', default="CPU",
+ap.add_argument('-affde', '--aff_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized aff_net neural network: MOVIDIUS, CPU, GPU")
-ap.add_argument('-posede', '--pose_net_device', default="CPU",
+ap.add_argument('-posede', '--pose_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized pose_net neural network: MOVIDIUS, CPU, GPU")
 
 args = vars(ap.parse_args())
