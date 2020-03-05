@@ -1,15 +1,16 @@
 import cv2
 import numpy as np
-from openvino.inference_engine import IENetwork, IEPlugin
+from openvino.inference_engine import IECore, IENetwork
 
 def load_net(net_xml, net_bin, device="CPU"):
     '''
     this function gets a neural net intermediate representation paths for both xml and bin,
     turns it into a IENetwork from OpenVINO and plugs it into a device
     '''
+    plugin = IECore()
     net = IENetwork(net_xml, net_bin)
-    plugin = IEPlugin(device)
-    exec_net = plugin.load(network=net)
+
+    exec_net = plugin.load_network(net, device)
     return exec_net
 
 def infere_from_image(img, blob_shape, exec_net, swapRB=True, input_layer_name="data"):
