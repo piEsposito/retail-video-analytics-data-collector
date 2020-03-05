@@ -8,6 +8,10 @@ def infer_from_video(cap, age_net, aff_net, pose_net, face_cascade, face_net):
     frame_nbr = 0
     collected_data = []
     fps_list = []
+
+    face_analyzer = FaceAnalyzer(age_net,
+                                 aff_net, 
+                                 pose_net)
     while(True):
         # Capture frame-by-frame
         video = cap.read()
@@ -20,11 +24,7 @@ def infer_from_video(cap, age_net, aff_net, pose_net, face_cascade, face_net):
         #infere age, gender and expression and label the image
         for face in faces:
             #print(face)
-            ((age, gender), aff_label), (yaw, pitch, roll) = infere_from_face(frame, gray,
-                                                                              face,
-                                                                              age_net,
-                                                                              aff_net,
-                                                                              pose_net)
+            ((age, gender), aff_label), (yaw, pitch, roll) = face_analyzer.infere_from_face(frame, gray, face)
 
             collected_data.append((frame_nbr, age, gender, aff_label, yaw, pitch, roll))
 
