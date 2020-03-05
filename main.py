@@ -43,9 +43,14 @@ pose_net_bin = "inference/neuralnets//head-pose-estimation-adas-0001.bin"
 pose_net_xml = "inference/neuralnets//head-pose-estimation-adas-0001.xml"
 exec_pose_net = load_net(pose_net_xml, pose_net_bin, device=args["pose_net_device"])
 
+
+face_net_bin = "inference/neuralnets//face-detection-retail-0004.bin"
+face_net_xml = "inference/neuralnets//face-detection-retail-0004.xml"
+exec_face_net = load_net(face_net_xml, face_net_bin, "CPU")
+
 face_cascade = cv2.CascadeClassifier('inference/neuralnets/haarcascade_frontalface_default.xml')
 
 #here we run the program
-data = infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade)
+data = infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade, exec_face_net)
 df = store_gathered_data(data, output_path=args["output_raw_data_path"])
 df_hoted = one_hot_encode_gathered_data(df, output_path=args["output_preprocessed_data_path"])

@@ -3,6 +3,23 @@ import cv2
 from openvino.inference_engine import IENetwork, IEPlugin
 from inference.inference_general_utils import *
 
+def find_faces(frame, exec_face_net):
+    # [1, 1, N, 7]
+    out_pred = infere_from_image(frame, exec_net=exec_face_net, blob_shape=(300, 300), swapRB=True, input_layer_name="data")
+    faces = out_pred["detection_out"]
+    coords = []
+    for i in range(faces.shape[2]):
+        #print(i)
+        face = faces[0, 0, i, :]
+        if face[2] > 0.65:
+            x = int(face[3] * 640)
+            y = int(face[4] * 480)
+            x_max = int(face[5] * 640)
+            y_max = int(face[6] * 480)
+            face_info = (x, y, x_max - x, y_max - y)
+            #print(face_info)
+            coords.append(face_info)
+    return coords
 
 def parse_age_gender(inference):
     '''
