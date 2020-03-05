@@ -2,24 +2,46 @@ import cv2
 import numpy as np
 from openvino.inference_engine import IECore, IENetwork
 
-def load_net(net_xml, net_bin, device="CPU"):
-    '''
-    this function gets a neural net intermediate representation paths for both xml and bin,
-    turns it into a IENetwork from OpenVINO and plugs it into a device
-    '''
-    plugin = IECore()
-    net = IENetwork(net_xml, net_bin)
 
-    exec_net = plugin.load_network(net, device)
-    return exec_net
+class OptimizedNN:
+    def __init__(self,
+                 net_xml,
+                 net_bin,
+                 blob_shape,
+                 input_layer_name,
+                 device="CPU",
+                 swapRB=True):
 
-def infere_from_image(img, blob_shape, exec_net, swapRB=True, input_layer_name="data"):
-    '''
-    this functions run a matrix-representation of a imege (or a frame), resizes it so it can run troghout the network
-    and gets its outputs as the selected layers
-    blob_shape = (n, m) as the input shape of the neural network
-    '''
-    #img = cv2.imread(img_path)
-    blob = cv2.dnn.blobFromImage(img, 1, blob_shape, 0,swapRB)
-    infers = exec_net.infer({input_layer_name:blob})
-    return infers
+        self.plugin = IECore()
+        self.net = IENetwork(net_xml, net_bin)
+        self.exec_net = self.plugin.load_network(self.net, device)
+        self.blob_shape = blob_shape
+        self.swapRB = swapRB
+        self.input_layer_name = input_layer_name
+
+    def infere_from_image(self, img):
+        blob = cv2.dnn.blobFromImage(img, 1, self.blob_shape, 0, self.swapRB)
+        infers = self.exec_net.infer({self.input_layer_name:blob})
+        return infers
+
+class MultiBoxNN(OptimizedNN):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def find_faces(self, frame):
+        # [1, 1, N, 7]
+        out_pred = self.infere_from_image(frame)
+        faces = out_pred["detection_out"]
+        coords = []
+        for i in range(faces.shape[2]):
+            #print(i)
+            face = faces[0, 0, i, :]
+            if face[2] > 0.65:
+                x = int(face[3] * 640)
+                y = int(face[4] * 480)
+                x_max = int(face[5] * 640)
+                y_max = int(face[6] * 480)
+                face_info = (x, y, x_max - x, y_max - y)
+                #print(face_info)
+                coords.append(face_info)
+        return coords

@@ -3,24 +3,6 @@ import cv2
 from openvino.inference_engine import IENetwork, IEPlugin
 from inference.inference_general_utils import *
 
-def find_faces(frame, exec_face_net):
-    # [1, 1, N, 7]
-    out_pred = infere_from_image(frame, exec_net=exec_face_net, blob_shape=(300, 300), swapRB=True, input_layer_name="data")
-    faces = out_pred["detection_out"]
-    coords = []
-    for i in range(faces.shape[2]):
-        #print(i)
-        face = faces[0, 0, i, :]
-        if face[2] > 0.65:
-            x = int(face[3] * 640)
-            y = int(face[4] * 480)
-            x_max = int(face[5] * 640)
-            y_max = int(face[6] * 480)
-            face_info = (x, y, x_max - x, y_max - y)
-            #print(face_info)
-            coords.append(face_info)
-    return coords
-
 def parse_age_gender(inference):
     '''
     this function gets the output of a inference of the age_gender_net and gets its label as male of female
@@ -42,7 +24,7 @@ def parse_sentiment(inference):
 
 #inference and plot funcions:
 
-def infere_from_face(frame, gray, face, exec_age_net, exec_aff_net, exec_pose_net):
+def infere_from_face(frame, gray, face, age_net, aff_net, pose_net):
     '''
     this function runs a face troughout age, gender and head-pose net and aff net, both plugged in with OpenVINO Inference Engine
     
@@ -50,7 +32,7 @@ def infere_from_face(frame, gray, face, exec_age_net, exec_aff_net, exec_pose_ne
     frame: matrix nxmx3, the latest captured by the camera
     gray: matrix nxmx1, the same frame, but in gray-scale, so it runs faster
     face: (x, y, width and height), coordinates to find face
-    exec_age-aff nets: OpenVINO Inference Engine Executable network
+    age-aff nets: OpenVINO Inference Engine Executable network
     
     what happens here is that we select subset the frame matrix to get only the person's face, so that we can resize it and run
     it through some neural networks and get its labels
@@ -65,13 +47,13 @@ def infere_from_face(frame, gray, face, exec_age_net, exec_aff_net, exec_pose_ne
     roi_color = frame[y:y+h, x:x+w]
 
     (startX, startY, endX, endY) = (x, y, x+w, y+h)
-    age_inf = infere_from_image(roi_gray, (62,62), exec_age_net)
+    age_inf = age_net.infere_from_image(roi_gray)
     age_label = parse_age_gender(age_inf)
 
-    aff_inf = infere_from_image(roi_gray, (64,64), exec_aff_net)
+    aff_inf = aff_net.infere_from_image(roi_gray) #infere_from_image(roi_gray, (64,64), aff_net)
     aff_label = parse_sentiment(aff_inf)
     
-    pose_inf = infere_from_image(roi_color, (60,60), exec_pose_net)
+    pose_inf = pose_net.infere_from_image(roi_color) #infere_from_image(roi_color, (60,60), pose_net)
     (yaw, pitch, roll) = pose_inf['angle_y_fc'][0][0], pose_inf['angle_p_fc'][0][0], pose_inf['angle_r_fc'][0][0]
     
     cv2.putText(frame, "Yaw: " + str(yaw), (x, y -50),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)

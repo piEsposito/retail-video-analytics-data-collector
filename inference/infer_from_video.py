@@ -3,7 +3,7 @@ from inference.inference_plot_neuralnets import *
 import time
 import numpy as np
 
-def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade, exec_face_net):
+def infer_from_video(cap, age_net, aff_net, pose_net, face_cascade, face_net):
     tic = time.time()
     frame_nbr = 0
     collected_data = []
@@ -16,15 +16,15 @@ def infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade
         #detect faces in gray frame, so it runs faster 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-        faces = find_faces(frame, exec_face_net)
+        faces = face_net.find_faces(frame)
         #infere age, gender and expression and label the image
         for face in faces:
             #print(face)
             ((age, gender), aff_label), (yaw, pitch, roll) = infere_from_face(frame, gray,
                                                                               face,
-                                                                              exec_age_net,
-                                                                              exec_aff_net,
-                                                                              exec_pose_net)
+                                                                              age_net,
+                                                                              aff_net,
+                                                                              pose_net)
 
             collected_data.append((frame_nbr, age, gender, aff_label, yaw, pitch, roll))
 

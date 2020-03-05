@@ -35,24 +35,47 @@ cap = cv2.VideoCapture(0)
 #here we set up our neural networks and face classifiers 
 age_net_bin = "inference/neuralnets/age-gender-recognition-retail-0013.bin"
 age_net_xml = "inference/neuralnets//age-gender-recognition-retail-0013.xml"
-exec_age_net = load_net(age_net_xml, age_net_bin, device=args["age_net_device"])
+#age_net = load_net(age_net_xml, age_net_bin, device=args["age_net_device"])
+age_net = OptimizedNN(age_net_xml,
+					  age_net_bin,
+					  blob_shape=(62,62),
+					  input_layer_name="data",
+					  device=args["age_net_device"],
+					  swapRB=True)
 
 aff_net_bin = "inference/neuralnets//emotions-recognition-retail-0003.bin"
 aff_net_xml = "inference/neuralnets//emotions-recognition-retail-0003.xml"
-exec_aff_net = load_net(aff_net_xml, aff_net_bin, device=args["aff_net_device"])
+#aff_net = load_net(aff_net_xml, aff_net_bin, device=args["aff_net_device"])
+aff_net = OptimizedNN(aff_net_xml,
+					  aff_net_bin,
+					  blob_shape=(64,64),
+					  input_layer_name="data",
+					  device=args["aff_net_device"],
+					  swapRB=True)
 
 pose_net_bin = "inference/neuralnets//head-pose-estimation-adas-0001.bin"
 pose_net_xml = "inference/neuralnets//head-pose-estimation-adas-0001.xml"
-exec_pose_net = load_net(pose_net_xml, pose_net_bin, device=args["pose_net_device"])
-
+#pose_net = load_net(pose_net_xml, pose_net_bin, device=args["pose_net_device"])
+pose_net = OptimizedNN(pose_net_xml,
+		 			   pose_net_bin,
+		 			   blob_shape=(60,60),
+		  			   input_layer_name="data",
+					   device=args["pose_net_device"],
+					   swapRB=True)
 
 face_net_bin = "inference/neuralnets//face-detection-retail-0004.bin"
 face_net_xml = "inference/neuralnets//face-detection-retail-0004.xml"
-exec_face_net = load_net(face_net_xml, face_net_bin, device=args["face_net_device"])
+#face_net = load_net(face_net_xml, face_net_bin, device=args["face_net_device"])
+face_net = MultiBoxNN(face_net_xml,
+					   face_net_bin,
+					   blob_shape=(300, 300),
+					   input_layer_name="data",
+					   device=args["pose_net_device"],
+					   swapRB=True)
 
 face_cascade = cv2.CascadeClassifier('inference/neuralnets/haarcascade_frontalface_default.xml')
 
 #here we run the program
-data = infer_from_video(cap, exec_age_net,exec_aff_net, exec_pose_net, face_cascade, exec_face_net)
+data = infer_from_video(cap, age_net, aff_net, pose_net, face_cascade, face_net)
 df = store_gathered_data(data, output_path=args["output_raw_data_path"])
 df_hoted = one_hot_encode_gathered_data(df, output_path=args["output_preprocessed_data_path"])
