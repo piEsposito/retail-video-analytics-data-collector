@@ -24,6 +24,8 @@ ap.add_argument('-affde', '--aff_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized aff_net neural network: MOVIDIUS, CPU, GPU")
 ap.add_argument('-posede', '--pose_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized pose_net neural network: MOVIDIUS, CPU, GPU")
+ap.add_argument('-facede', '--face_net_device', required=False, default="CPU",
+		help="device to plugin the OpenVINO optimized pose_net neural network: MOVIDIUS, CPU, GPU")
 
 args = vars(ap.parse_args())
 #print(args)
@@ -46,7 +48,7 @@ exec_pose_net = load_net(pose_net_xml, pose_net_bin, device=args["pose_net_devic
 
 face_net_bin = "inference/neuralnets//face-detection-retail-0004.bin"
 face_net_xml = "inference/neuralnets//face-detection-retail-0004.xml"
-exec_face_net = load_net(face_net_xml, face_net_bin, "CPU")
+exec_face_net = load_net(face_net_xml, face_net_bin, device=args["face_net_device"])
 
 face_cascade = cv2.CascadeClassifier('inference/neuralnets/haarcascade_frontalface_default.xml')
 
