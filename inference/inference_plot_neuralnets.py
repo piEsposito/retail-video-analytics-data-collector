@@ -84,9 +84,6 @@ class FaceAnalyzer:
 
         (startX, startY, endX, endY) = (x, y, max_x, max_y)
 
-        #print(gray.shape)
-        #print(face)
-        print((startX, startY, endX, endY))
         age_inf = self.age_net.infere_from_image(roi_gray)
         age_label = self.parse_age_gender(age_inf)
 
@@ -102,7 +99,8 @@ class FaceAnalyzer:
 
         id_hash = self.reid_net.infere_from_image(roi_color)
         face_id = self.parse_id(id_hash)
+
         label = str(age_label) + str(aff_label) 
         cv2.putText(frame, str(label), (x, y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,0), 2)
         cv2.putText(frame, "id: "+ str(face_id), (x-40, y-45),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2)
-        return (age_label, aff_label), (yaw, pitch, roll)
+        return (age_label, aff_label), (yaw, pitch, roll), face_id

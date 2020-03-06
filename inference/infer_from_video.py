@@ -67,8 +67,8 @@ class VideoAnalyzer:
         if len(faces) == 0:
             return
         for face in faces:
-            ((age, gender), aff_label), (yaw, pitch, roll) = self.face_analyzer.infere_from_face(frame, gray, face)
-            self.collected_data.append((self.frame_nbr, age, gender, aff_label, yaw, pitch, roll))
+            ((age, gender), aff_label), (yaw, pitch, roll), face_id = self.face_analyzer.infere_from_face(frame, gray, face)
+            self.collected_data.append((self.frame_nbr, age, gender, aff_label, yaw, pitch, roll, face_id))
 
     def store_gathered_data(self,
                             output_path="video_data.csv"):
@@ -76,7 +76,7 @@ class VideoAnalyzer:
         Stores the data from the captured frames
         """
         as_df = pd.DataFrame(self.collected_data)
-        as_df.columns = ["frame", "age", "gender", "emotion", "yaw", "pitch", "roll"]
+        as_df.columns = ["frame", "age", "gender", "emotion", "yaw", "pitch", "roll", "face_id"]
         print("\n[INFO] - saving raw collected data to csv in in path:", output_path)
         as_df.to_csv(output_path)
         return as_df 
