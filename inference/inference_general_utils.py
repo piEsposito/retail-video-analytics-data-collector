@@ -20,6 +20,7 @@ class OptimizedNN:
         self.input_layer_name = input_layer_name
 
     def infere_from_image(self, img):
+        #print(img.shape)
         blob = cv2.dnn.blobFromImage(img, 1, self.blob_shape, 0, self.swapRB)
         infers = self.exec_net.infer({self.input_layer_name:blob})
         return infers

@@ -10,7 +10,7 @@ class FaceAnalyzer:
                  aff_net, 
                  pose_net,
                  reid_net,
-                 theta = 0.35):
+                 theta = 0.55):
 
         self.age_net = age_net
         self.aff_net = aff_net
@@ -19,7 +19,6 @@ class FaceAnalyzer:
         self.hashes = []
         self.theta = theta
         
-
 
     def parse_id(self, inference):
         #checks if persons id is in the list and gives its label
@@ -74,11 +73,20 @@ class FaceAnalyzer:
         '''
         
         (x, y, w, h) = face
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-        roi_gray = gray[y:y+h, x:x+w]
-        roi_color = frame[y:y+h, x:x+w]
+        x = max(0, x)
+        y = max(0, y)
+        max_x = min(frame.shape[0], x+w)
+        max_y = min(frame.shape[1], y+h)
+        
+        cv2.rectangle(frame,(x,y),(max_x,max_y),(255,0,0),2)
+        roi_gray = gray[x:max_x, y:max_y]
+        roi_color = frame[x:max_x, y:max_y]
 
-        (startX, startY, endX, endY) = (x, y, x+w, y+h)
+        (startX, startY, endX, endY) = (x, y, max_x, max_y)
+
+        #print(gray.shape)
+        #print(face)
+        print((startX, startY, endX, endY))
         age_inf = self.age_net.infere_from_image(roi_gray)
         age_label = self.parse_age_gender(age_inf)
 
