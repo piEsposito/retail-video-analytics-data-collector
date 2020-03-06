@@ -77,20 +77,22 @@ class FaceAnalyzer:
         y = max(0, y)
         max_x = min(frame.shape[0], x+w)
         max_y = min(frame.shape[1], y+h)
+
+        #max_x, max_y = x+w, y+h
         
         cv2.rectangle(frame,(x,y),(max_x,max_y),(255,0,0),2)
         roi_gray = gray[x:max_x, y:max_y]
         roi_color = frame[x:max_x, y:max_y]
 
         (startX, startY, endX, endY) = (x, y, max_x, max_y)
-
-        age_inf = self.age_net.infere_from_image(roi_gray)
+        #print(startX, startY, endX, endY)
+        age_inf = self.age_net.infere_from_image(roi_color)
         age_label = self.parse_age_gender(age_inf)
 
         aff_inf = self.aff_net.infere_from_image(roi_gray) #infere_from_image(roi_gray, (64,64), aff_net)
         aff_label = self.parse_sentiment(aff_inf)
         
-        pose_inf = self.pose_net.infere_from_image(roi_color) #infere_from_image(roi_color, (60,60), pose_net)
+        pose_inf = self.pose_net.infere_from_image(roi_gray) #infere_from_image(roi_color, (60,60), pose_net)
         (yaw, pitch, roll) = pose_inf['angle_y_fc'][0][0], pose_inf['angle_p_fc'][0][0], pose_inf['angle_r_fc'][0][0]
         
         cv2.putText(frame, "Yaw: " + str(yaw), (x, y -50),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
