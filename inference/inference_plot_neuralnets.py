@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from scipy.spatial.distance import cosine as cosine_distance
 from openvino.inference_engine import IENetwork, IEPlugin
 from inference.inference_general_utils import *
 
@@ -7,12 +8,31 @@ class FaceAnalyzer:
     def __init__(self,
                  age_net,
                  aff_net, 
-                 pose_net):
+                 pose_net,
+                 reid_net,
+                 theta = 0.35):
 
         self.age_net = age_net
         self.aff_net = aff_net
         self.pose_net = pose_net
+        self.reid_net = reid_net
+        self.hashes = []
+        self.theta = theta
         
+
+
+    def parse_id(self, inference):
+        #checks if persons id is in the list and gives its label
+        arr = inference['658'][0, :, 0, 0]
+        if len(self.hashes) == 0:
+            self.hashes.append(arr)
+            return 0
+        if len(self.hashes) >= 1:
+            for i in range(len(self.hashes)):
+                if cosine_distance(arr, self.hashes[i]) < self.theta:
+                    return i
+        self.hashes.append(arr)
+        return(len(self.hashes) - 1)
 
     def parse_age_gender(self, inference):
         '''
@@ -72,6 +92,9 @@ class FaceAnalyzer:
         cv2.putText(frame, "Pitch: " + str(pitch), (x, y-35),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
         cv2.putText(frame, "Roll: "+str(roll), (x, y-20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
 
+        id_hash = self.reid_net.infere_from_image(roi_color)
+        face_id = self.parse_id(id_hash)
         label = str(age_label) + str(aff_label) 
         cv2.putText(frame, str(label), (x, y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,0), 2)
+        cv2.putText(frame, "id: "+ str(face_id), (x-40, y-45),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2)
         return (age_label, aff_label), (yaw, pitch, roll)

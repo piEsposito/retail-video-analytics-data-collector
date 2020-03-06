@@ -14,13 +14,15 @@ class VideoAnalyzer:
                  aff_net,
                  pose_net,
                  face_net,
+                 reid_net,
                  face_cascade=None,):
 
         self.cap = cap
         self.face_net = face_net
         self.face_analyzer = FaceAnalyzer(age_net,
                                           aff_net, 
-                                          pose_net,)
+                                          pose_net,
+                                          reid_net)
         self.collected_data = []
         self.frame_nbr = 0
 
@@ -62,6 +64,8 @@ class VideoAnalyzer:
         analizes and anotates the frame
         """
         faces = self.face_net.find_faces(frame)
+        if len(faces) == 0:
+            return
         for face in faces:
             ((age, gender), aff_label), (yaw, pitch, roll) = self.face_analyzer.infere_from_face(frame, gray, face)
             self.collected_data.append((self.frame_nbr, age, gender, aff_label, yaw, pitch, roll))

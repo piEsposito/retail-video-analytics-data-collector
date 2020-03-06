@@ -24,7 +24,9 @@ ap.add_argument('-affde', '--aff_net_device', required=False, default="CPU",
 ap.add_argument('-posede', '--pose_net_device', required=False, default="CPU",
 		help="device to plugin the OpenVINO optimized pose_net neural network: MOVIDIUS, CPU, GPU")
 ap.add_argument('-facede', '--face_net_device', required=False, default="CPU",
-		help="device to plugin the OpenVINO optimized pose_net neural network: MOVIDIUS, CPU, GPU")
+		help="device to plugin the OpenVINO optimized face neural network: MOVIDIUS, CPU, GPU")
+ap.add_argument('-freidde', '--reid_net_device', required=False, default="CPU",
+		help="device to plugin the OpenVINO optimized reid neural network: MOVIDIUS, CPU, GPU")
 
 args = vars(ap.parse_args())
 cap = cv2.VideoCapture(0)
@@ -57,13 +59,22 @@ pose_net = OptimizedNN(pose_net_xml,
 					   device=args["pose_net_device"],
 					   swapRB=True)
 
+reid_net_bin = "inference/neuralnets//face-reidentification-retail-0095.bin"
+reid_net_xml = "inference/neuralnets//face-reidentification-retail-0095.xml"
+reid_net = OptimizedNN(reid_net_xml,
+					  reid_net_bin,
+					  blob_shape=(128, 128),
+					  input_layer_name="0",
+					  device=args["reid_net_device"],
+					  swapRB=True)
+
 face_net_bin = "inference/neuralnets//face-detection-retail-0004.bin"
 face_net_xml = "inference/neuralnets//face-detection-retail-0004.xml"
 face_net = MultiBoxNN(face_net_xml,
 					   face_net_bin,
 					   blob_shape=(300, 300),
 					   input_layer_name="data",
-					   device=args["pose_net_device"],
+					   device=args["face_net_device"],
 					   swapRB=True)
 
 #face_cascade = cv2.CascadeClassifier('inference/neuralnets/haarcascade_frontalface_default.xml')
@@ -73,6 +84,8 @@ videoanalyzer = VideoAnalyzer(cap,
 							  aff_net,
 							  pose_net,
 							  face_net,
+							  reid_net,
 							  face_cascade=None,)
+
 videoanalyzer.analyze_video()
 videoanalyzer.store_gathered_data(output_path=args["output_raw_data_path"])
