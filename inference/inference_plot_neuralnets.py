@@ -71,33 +71,25 @@ class FaceAnalyzer:
         as the frame is passed by value due to Python, I decided to use this function to actually plot it in the frame, so we can see
         the detections
         '''
-        
         (x, y, w, h) = face
-        x = max(0, x)
-        y = max(0, y)
-        max_x = min(frame.shape[0], x+w)
-        max_y = min(frame.shape[1], y+h)
+        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+        roi_gray = gray[y:y+h, x:x+w]
+        roi_color = frame[y:y+h, x:x+w]
 
-        #max_x, max_y = x+w, y+h
-        
-        cv2.rectangle(frame,(x,y),(max_x,max_y),(255,0,0),2)
-        roi_gray = gray[x:max_x, y:max_y]
-        roi_color = frame[x:max_x, y:max_y]
-
-        (startX, startY, endX, endY) = (x, y, max_x, max_y)
-        #print(startX, startY, endX, endY)
-        age_inf = self.age_net.infere_from_image(roi_color)
+        (startX, startY, endX, endY) = (x, y, x+w, y+h)
+        age_inf = self.age_net.infere_from_image(roi_gray)
         age_label = self.parse_age_gender(age_inf)
 
         aff_inf = self.aff_net.infere_from_image(roi_gray) #infere_from_image(roi_gray, (64,64), aff_net)
         aff_label = self.parse_sentiment(aff_inf)
         
-        pose_inf = self.pose_net.infere_from_image(roi_gray) #infere_from_image(roi_color, (60,60), pose_net)
+        pose_inf = self.pose_net.infere_from_image(roi_color) #infere_from_image(roi_color, (60,60), pose_net)
         (yaw, pitch, roll) = pose_inf['angle_y_fc'][0][0], pose_inf['angle_p_fc'][0][0], pose_inf['angle_r_fc'][0][0]
         
         cv2.putText(frame, "Yaw: " + str(yaw), (x, y -50),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
         cv2.putText(frame, "Pitch: " + str(pitch), (x, y-35),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
         cv2.putText(frame, "Roll: "+str(roll), (x, y-20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
+
 
         id_hash = self.reid_net.infere_from_image(roi_color)
         face_id = self.parse_id(id_hash)
