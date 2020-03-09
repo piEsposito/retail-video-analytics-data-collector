@@ -72,11 +72,22 @@ class FaceAnalyzer:
         the detections
         '''
         (x, y, w, h) = face
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-        roi_gray = gray[y:y+h, x:x+w]
-        roi_color = frame[y:y+h, x:x+w]
 
-        (startX, startY, endX, endY) = (x, y, x+w, y+h)
+        max_x = x+w
+        max_y = y+h
+
+        #print(x, y, max_x, max_y)
+        if ((max_y <= 0 ) or (max_x <= 0) or (y <= 0 ) or (x <= 0)):
+            #return all zeros as we can make no prediction
+            #print("aaaa")
+            return ((0, 0), 0), (0, 0, 0), 0
+
+        cv2.rectangle(frame,(x,y),(max_x,max_y),(255,0,0),2)
+        roi_gray = gray[y:max_y, x:max_x]
+        roi_color = frame[y:max_y, x:max_x]
+
+        
+        (startX, startY, endX, endY) = (x, y, max_x, max_y)
         age_inf = self.age_net.infere_from_image(roi_gray)
         age_label = self.parse_age_gender(age_inf)
 
